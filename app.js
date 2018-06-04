@@ -22,22 +22,35 @@ bot.sendMessage(config.self_tgID, 'Server restarted.')
 
 bot.on('message', msg => {
     // console.log( msg )
-    if( msg.from.id != config.self_tgID ) {
-        bot.sendMessage(msg.from.id, 'You have no permission to talk with me.')
-        return
-    }
+    let sender = msg.from.id
+    if( sender != config.self_tgID ) return bot.sendMessage(sender, 'You have no permission to talk with me.')
     args = msg.text.split(' ')
     console.log(args)
     if( args[0] === 'check' ) {
-        bot.sendMessage(msg.from.id, 'Server is running now.')
+        bot.sendMessage(sender, 'Server is running now.')
     }
-    if( args[0] === '$' ) {
+    else if( args[0] === 'minecraft' ) {
+        let res = childProcess.execSync('tmux ls', { encoding:'ascii' })
+        let serverRunning = (res.indexOf('minecraft') !== -1)
+        if( args[1] === undefined ) {
+            bot.sendMessage(sender, serverRunning ?
+                'Minecraft server is running.' :
+                'Minecraft server is not running.')
+        }
+        else if( args[1] === 'start' ) {
+            if( serverRunning ) return bot.sendMessage(sender, 'Minecraft server is already running.')
+            childProcess.execSync('tmux new-session -d -s minecraft \'~/minecraft/IE/ServerStart.sh\'')
+        }
+        else if( args[1] === 'ssttoopp' ) {
+            if( !serverRunning ) return bot.sendMessage(sender, 'Minecraft server is not running now.')
+            childProcess.execSync('tmux kill-session -s minecraft')
+        }
+    }
+    else if( args[0] === '$' ) {
         args.splice(0, 1)
         let command = args.join(' ')
-        let res = childProcess.execSync(command, {
-            encoding: 'ascii'
-        })
-        bot.sendMessage(msg.from.id, res)
+        let res = childProcess.execSync(command, {  encoding:'ascii' })
+        bot.sendMessage(sender, res)
     }
-    else bot.sendMessage(msg.from.id, 'What?')
+    else bot.sendMessage(sender, 'What?')
 })
