@@ -2,6 +2,7 @@ const config = require('./config.json')
 const request = require('request')
 const cheerio = require('cheerio')
 
+const http = require('http')
 const childProcess = require('child_process')
 
 const tgbotapi = require('node-telegram-bot-api')
@@ -65,10 +66,9 @@ bot.on('message', msg => {
     else if( args[0] === 'getip' ) {
         console.log(config.registedUser[args[0]], sender)
         if( !config.registedUser[args[0]].includes(sender) ) return noPermission(sender)
-        request.get({ url: 'https://myip.com.tw/' }, (err, header, body) => {
+        request.get({ url: 'https://api.ipify.org/' }, (err, header, body) => {
             if(err) return bot.sendMessage(sender, 'Error happen when getting ip.' + err)
-            let $ = cheerio.load(body, { decodeEntities: false })
-            bot.sendMessage(sender, 'Server\'s ip is ' + $('h1 font').html())
+            bot.sendMessage(sender, 'Server\'s ip is ' + body)
         })
     }
     else if( args[0] === 'regist') {
