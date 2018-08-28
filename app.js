@@ -30,7 +30,7 @@ bot.on('message', msg => {
     // console.log( msg )
     let sender = msg.from.id
     // if( sender != config.self_tgID ) return bot.sendMessage(sender, 'You have no permission to talk with me.')
-    args = msg.text.split(' ')
+    let args = msg.text.split(' ')
     console.log(args)
     if( args[0] === 'check' ) {
         bot.sendMessage(sender, 'Server is running now.')
@@ -76,4 +76,8 @@ bot.on('message', msg => {
         bot.sendMessage(sender, 'Received regist request, please wait for apply.')
     }
     else bot.sendMessage(sender, 'What?')
+})
+
+bot.on('polling_error', (err) => {
+    console.log(err)
 })
